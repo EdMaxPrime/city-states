@@ -1,24 +1,52 @@
 function registerElements() {
+    canvas.display.register("tooltip", {
+            shapetype : "rectangular",
+            text : "",
+            pointAt : 0,
+            pointerSide : "left",
+            show : false,
+            initRun : false,
+            onInit : function(object) {
+                
+            }
+        }, function(_canvas) {
+            if (this.initRun == false) {
+                this.onInit();
+                this.initRun = true;
+            }
+            if (this.show == true && this.text !== "") {
+                _canvas.beginPath();
+                _canvas.fillStyle = colors.textVeryLight;
+                _canvas.
+                _canvas.closePath();
+            }
+        }
+    );
     canvas.display.register("button", {
         shapeType : "rectangular",
         action : function(source) {},
         buttonState : "normal",
         initRun : false,
-        init : function() {
+        width : ofWidth("1/6"),
+        height : ofHeight("1/13"),
+        text : "",
+        children : [canvas.display.tooltip({})],
+        onInit : function() {
             this.action = this.action || function(source) {};
             this.buttonState = "normal";
-            this.bind("mouseenter touchenter", function() { this.buttonState = "hover"; canvas.redraw(); });
-            this.bind("mouseleave touchleave", function() { this.buttonState = "normal"; canvas.redraw(); });
-            this.bind("mousedown touchstart", function() { this.buttonState = "pressed"; canvas.redraw(); });
+            this.bind("mouseenter touchenter", function(evt) {
+                this.buttonState = "hover";
+                this.children[0].pointAt = (this.abs_y - this.getOrigin().y) + this.height/2;
+                this.children[0].show = true;
+                canvas.redraw();
+            });
+            this.bind("mouseleave touchleave", function(evt) { this.buttonState = "normal"; this.children[0].show = false; canvas.redraw(); });
+            this.bind("mousedown touchstart", function(evt) { this.buttonState = "pressed"; canvas.redraw(); });
             this.bind("click tap", function() { this.buttonState = "hover"; canvas.redraw(); this.action(this); });
         }
         }, function(_canvas) {
             if (this.initRun == false) {
-                this.bind("mouseenter", function() { this.buttonState = "hover"; canvas.redraw(); });
-                this.bind("mouseleave", function() { this.buttonState = "normal"; canvas.redraw(); });
-                this.bind("mousedown", function() { this.buttonState = "pressed"; canvas.redraw(); })
-                this.bind("click", function() { this.action(this); });
-                this.bind("mouseup", function() { this.buttonState = "hover"; canvas.redraw(); });
+                this.onInit();
                 this.initRun = true;
             }
             var origin = this.getOrigin(),
@@ -34,12 +62,12 @@ function registerElements() {
             _canvas.strokeStyle = colors.buttonNormal;
             _canvas.strokeRect(x, y, width, height);
             _canvas.fillRect(x, y, width, height);
-            _canvas.font = textSizes[0] + "px sans-serif";
+            _canvas.font = textSizes[0] + "px raleway";
             _canvas.fillStyle = "white";
             var m = _canvas.measureText(this.text);
             _canvas.fillText(this.text, x + (width - m.width)/2, y + height - (textSizes[0] + 4)/2);
             _canvas.closePath();
-        }, "init"
+        }, "onInit"
     );
 }
 
@@ -50,4 +78,21 @@ function extend(original, extender) {
         }
     }
     return original;
+}
+
+function ofWidth(fraction, width) {
+    width = width || canvas.width;
+    var numerator = parseInt(fraction.split("/")[0]);
+    var denominator = parseInt(fraction.split("/")[1]);
+    return Math.round(numerator * (width/denominator));
+}
+function ofHeight(fraction, height) {
+    height = height || canvas.height;
+    var numerator = parseInt(fraction.split("/")[0]);
+    var denominator = parseInt(fraction.split("/")[1]);
+    return Math.round(numerator * (height/denominator));
+}
+function fancyText(ctx, text) {
+    var buffer = text.splitTokens("<>");
+    var justTheText = text.split(/<[^<>]*?>/g).join("");
 }
