@@ -7,9 +7,9 @@ function registerElements() {
         init : function() {
             this.action = this.action || function(source) {};
             this.buttonState = "normal";
-            this.bind("mouseenter", function() { this.buttonState = "hover"; canvas.redraw(); });
-            this.bind("mouseleave", function() { this.buttonState = "normal"; canvas.redraw(); });
-            this.bind("mousedown", function() { this.buttonState = "pressed"; canvas.redraw(); });
+            this.bind("mouseenter touchenter", function() { this.buttonState = "hover"; canvas.redraw(); });
+            this.bind("mouseleave touchleave", function() { this.buttonState = "normal"; canvas.redraw(); });
+            this.bind("mousedown touchstart", function() { this.buttonState = "pressed"; canvas.redraw(); });
             this.bind("click tap", function() { this.buttonState = "hover"; canvas.redraw(); this.action(this); });
         }
         }, function(_canvas) {
