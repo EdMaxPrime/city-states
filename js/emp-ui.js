@@ -74,7 +74,7 @@ function registerElements() {
             action : function() {},
             direction : "right",
             width : ofHeight("1/6"),
-            height : ofHeight("1/6"),
+            height : ofHeight("1/9"),
             arrowState : "normal",
             initRun : false,
             onInit : function() {
@@ -110,7 +110,7 @@ function registerElements() {
             _canvas.moveTo(x + ofWidth("1/3", width), y);
             _canvas.lineTo(x, y + ofHeight("1/2", height));
             _canvas.lineTo(x + ofWidth("1/3", width), y + height);
-            _canvas.moveTo(x + 5, y + ofHeight("1/2", height));
+            _canvas.moveTo(x, y + ofHeight("1/2", height));
             _canvas.lineTo(x + width, y + ofHeight("1/2", height));
             _canvas.stroke();
         }, "onInit"

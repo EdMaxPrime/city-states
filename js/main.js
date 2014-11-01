@@ -57,8 +57,8 @@ oCanvas.domReady(function() {
     canvas.scenes.create("/modes", function() {
         canvas.clear(true);
         var back = canvas.display.arrow({
-            x : 0,
-            y : 0,
+            x : 5,
+            y : 5,
             action : function(elem) { canvas.scenes.load("main", true); }
         });
         var title = canvas.display.text({
