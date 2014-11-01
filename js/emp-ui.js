@@ -103,7 +103,9 @@ function registerElements() {
             if (this.arrowState === "pressed") {
                 _canvas.strokeStyle = colors.textDark;
             } else if (this.arrowState === "hover") {
-                _canvas.strokeStyle = "#ffffff";
+                _canvas.strokeStyle = colors.textVeryLight;
+                _canvas.fillStyle = "rgba(255, 255, 255, 0.1)";
+                _canvas.fillRect(x - 5, y - 5, width + 10, height + 10);
             } else { //normal
                 _canvas.strokeStyle = colors.textNormal;
             }
