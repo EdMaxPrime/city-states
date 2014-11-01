@@ -69,6 +69,52 @@ function registerElements() {
             _canvas.closePath();
         }, "onInit"
     );
+    canvas.display.register("arrow", {
+            shapeType : "rectangular",
+            action : function() {},
+            direction : "right",
+            width : ofHeight("1/6"),
+            height : ofHeight("1/6"),
+            arrowState : "normal",
+            initRun : false,
+            onInit : function() {
+                this.action = this.action || function(source) {};
+                this.arrowState = "normal";
+                this.bind("mouseenter touchenter", function() {
+                    this.arrowState = "hover";
+                    canvas.redraw();
+                });
+                this.bind("mouseleave touchleave", function(evt) { this.arrowState = "normal"; canvas.redraw(); });
+                this.bind("mousedown touchstart", function(evt) { this.arrowState = "pressed"; canvas.redraw(); });
+                this.bind("click tap", function(evt) { this.arrowState = "hover"; canvas.redraw(); this.action(this); });
+            }
+        }, function(_canvas) {
+            if (this.initRun == false) {
+                this.onInit();
+                this.initRun = true;
+            }
+            var origin = this.getOrigin(),
+                x = this.abs_x - origin.x,
+                y = this.abs_y - origin.y,
+                width = this.width,
+                height = this.height;
+            _canvas.beginPath();
+            _canvas.lineWidth = 5;
+            if (this.arrowState === "pressed") {
+                _canvas.strokeStyle = colors.textDark;
+            } else if (this.arrowState === "hover") {
+                _canvas.strokeStyle = "#ffffff";
+            } else { //normal
+                _canvas.strokeStyle = colors.textNormal;
+            }
+            _canvas.moveTo(x + ofWidth("1/3", width), y);
+            _canvas.lineTo(x, y + ofHeight("1/2", height));
+            _canvas.lineTo(x + ofWidth("1/3", width), y + height);
+            _canvas.moveTo(x + 5, y + ofHeight("1/2", height));
+            _canvas.lineTo(x + width, y + ofHeight("1/2", height));
+            _canvas.stroke();
+        }, "onInit"
+    );
 }
 
 function extend(original, extender) {

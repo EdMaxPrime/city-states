@@ -56,6 +56,11 @@ oCanvas.domReady(function() {
     });
     canvas.scenes.create("/modes", function() {
         canvas.clear(true);
+        var back = canvas.display.arrow({
+            x : 0,
+            y : 0,
+            action : function(elem) { canvas.scenes.load("main", true); }
+        });
         var title = canvas.display.text({
             font : "normal " + textSizes[1] + "px molot",
             text : "Select Mode",
@@ -99,6 +104,7 @@ oCanvas.domReady(function() {
             x : ofWidth("1/4"),
             width : ofWidth("1/2"),
         });
+        this.add(back);
         this.add(title);
         this.add(infinite);
         this.add(campaign);
