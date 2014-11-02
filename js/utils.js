@@ -12,13 +12,16 @@ Array.prototype.average = function(from, to, increment) {
     return total / items;
 }
 
-Array.prototype.each = function(func, from, to, increment) {
+Array.prototype.each = function(func, from, to, increment, environment) {
     func = func || function(index, element) {};
     from = from || 0;
     to = to || this.length;
     increment = increment || 1;
     for(var i = from; i < to; i += increment) {
-        func(i, this[i]);
+        environment = func.apply(this, i, this[i], environment);
+    }
+    if (environment != undefined) {
+        return environment;
     }
     return this;
 }
@@ -27,12 +30,67 @@ Array.prototype.fromEnd = function(index) {
     if (typeof index !== "number" || index >= this.length || index < 0) {
         return undefined;
     } else {
-        return this[this.length - 1 + index];
+        return this[this.length - 1 - index];
+    }
+}
+
+Array.prototype.insert = function(index, newElement) {
+    for(var i = 1; i < arguments.length; i++) {
+        this.splice(index, 0, arguments[i]);
+    }
+}
+
+Array.prototype.cloneElement = function(originalIndex, times, targetIndex, replace) {
+    if(typeof replace !== "boolean") replace = false;
+    if(typeof originalIndex !== "number") originalIndex = 0;
+    if(typeof times !== "number") times = 0;
+    if(typeof targetIndex !== "number") targetIndex = 0;
+    if(Math.abs(originalIndex) >= this.length) { originalIndex = Math.abs(originalIndex) % this.length }
+    if(Math.abs(targetIndex) >= this.length) { targetIndex = Math.abs(targetIndex) % this.length }
+    if(replace == true) {
+        this.each(function(index, element, environment) {
+            this[index] = environment.elem;
+        }, targetIndex, targetIndex + times, 1, { elem : this[originalIndex] });
+    } else {
+        for(var i = 0; i < times; i++) {
+            this.insert(targetIndex + i, this[originalIndex]);
+        }
+    }
+}
+
+Array.prototype.indexOf = function(element, start) {
+    if(typeof start == "number") {
+        if (start < 0 || start >= this.length) {
+            for(var x = start; x < this.length; x++) {
+                if (this[x] === element) {
+                    return x;
+                }
+            }
+        }
+    } else {
+        for(var x in this) {
+            if (this[x] === element) {
+                return x;
+            }
+        }
+    }
+    return -1;
+}
+
+Array.prototype.replace = function(element, replaceWith, all) {
+    var found = this.indexOf(element);
+    this[found] = replaceWith;
+    if (all == true) {
+        var i = found;
+        while(i < this.length && i != -1) {
+            i = this.indexOf(element, i + 1);
+            this[i] = replaceWith;
+        }
     }
 }
 
 String.prototype.splitTokens = function(tokens) {
-    if (tokens == undefined || tokens.length < 1) {
+    if (tokens == undefined || tokens instanceof Array == false || tokens.length < 1) {
         tokens = [" "];
     }
     var pieces = [this.substring(0, this.length)];
@@ -52,7 +110,7 @@ String.prototype.splitTokens = function(tokens) {
  *@param {Array} format An array of strings describing the format, the last one should be
  *the actual pattern. The format for the strings should be "symbol=range" where symbol is
  *a single character, followed by an equal sign. Range reprents either an inclusive number
- *range where two numbers are separated by an ampersand "&", or an exclusive list where two
+ *range where two numbers are separated by an ampersand "&", or a negated list where two
  *numbers are separated by an exclamation point, or a conditional where a greater than ">"
  *or a less than "<" sign precedes a number, or a list of numbers separated by commas ",".
  *The list can contain a single number, since conditionals do not support the equal sign
@@ -73,4 +131,8 @@ String.prototype.splitTokens = function(tokens) {
 */
 String.prototype.getNumbers = function(format, numbers) {
     
+}
+
+String.prototype.stripTags = function() {
+    return this.split(/<[^<>]*?>/g);
 }
