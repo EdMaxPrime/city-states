@@ -13,12 +13,12 @@ Array.prototype.average = function(from, to, increment) {
 }
 
 Array.prototype.each = function(func, from, to, increment, environment) {
-    func = func || function(index, element) {};
+    func = func || function(index, element, env) {};
     from = from || 0;
     to = to || this.length;
     increment = increment || 1;
     for(var i = from; i < to; i += increment) {
-        environment = func.apply(this, i, this[i], environment);
+        environment = func.apply(this, [i, this[i], environment]);
     }
     if (environment != undefined) {
         return environment;
@@ -89,6 +89,10 @@ Array.prototype.replace = function(element, replaceWith, all) {
     }
 }
 
+Array.prototype.get = function(from, to) {
+    return this.each(function(index, elem, env) {env.push(elem);}, from, to, 1, []);
+}
+
 String.prototype.splitTokens = function(tokens) {
     if (tokens == undefined || tokens instanceof Array == false || tokens.length < 1) {
         tokens = [" "];
@@ -118,16 +122,23 @@ String.prototype.splitTokens = function(tokens) {
  *
  *The pattern string contains your symbols as well as the buil-in ones. Here are the built-in
  *symbols:
- * + matches positive numbers only.
- * - matches negative numbers only.
- * # matches any digit from 0-9.("# = 0 & 9")
- * . matches a decimal 
- * Whitespace DOES matter in the pattern string, since any character not in the format array
- * will be matched literally. Regular expressions will not be evaluated.
+ *  + matches positive numbers only("+ = > 0").
+ *  - matches negative numbers only("- = < 0").
+ *  # matches any digit from 0-9("# = 0 & 9").
+ *  . matches a decimal(this is a literal token).
+ *NOTE: if
+ *If you precede any symbol, predefined or not, with a number x that is surrounded in
+ *parenthesis then it has the meaning "Match the following symbol x times", if the last
+ *symbol before the closing parenthesis is a backslash "\" then the parenthesis lose their
+ *special meaning and will match literally. A plus has the meaning "Match at least x times"
+ *and a minus means "Match at most x times".
+ *Whitespace DOES matter in the pattern string, since any character not in the format array
+ *will be matched literally. Regular expressions will NOT be evaluated except the parenthesis
+ *mentioned above.
  *
- * @param {Array} numbers an array of strings that represent the digits. Their index represents
- * their numerical value. For example, hexadecimal would look like this:
- * ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
+ *@param {Array} numbers an array of strings that represent the digits. Their index represents
+ *their numerical value. For example, hexadecimal would look like this:
+ *["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"]
 */
 String.prototype.getNumbers = function(format, numbers) {
     
